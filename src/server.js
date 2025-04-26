@@ -1,23 +1,18 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import authRoutes from './routes/authRoutes.js';
-import carRoutes from './routes/carRoutes.js';
-import orderRoutes from './routes/orderRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-import { notFound, errorHandler } from './middleware/errorMiddleware.js';
-import pool from './config/db.js';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
+const express = require('express');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const path = require('path');
+const { pool } = require('./config/db');
+const authRoutes = require('./routes/authRoutes');
+const carRoutes = require('./routes/carRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 // Configure environment variables
 dotenv.config();
-
-// ES module fix for __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Create Express app
 const app = express();
@@ -25,14 +20,14 @@ const app = express();
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: 'http://localhost:5173', // Update with your frontend URL
+  origin: 'http://localhost:5173',
   credentials: true
 }));
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100
 });
 app.use(limiter);
 
@@ -74,5 +69,5 @@ app.use(errorHandler);
 // Server setup
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
