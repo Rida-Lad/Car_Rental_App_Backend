@@ -1,4 +1,5 @@
 import express from 'express';
+import upload from '../utils/fileUpload.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 import { 
   getAllOrders,
@@ -11,7 +12,7 @@ import {
 const router = express.Router();
 
 // Car management
-router.post('/addcar', protect, admin, createCar);
+router.post('/addcar', protect, admin, upload.single('image'), createCar);
 router.get('/cars', protect, admin, getAllCars);
 router.patch('/cars/:id/availability', protect, admin, updateCarAvailability);
 

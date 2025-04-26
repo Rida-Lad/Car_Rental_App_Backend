@@ -2,12 +2,20 @@ import pool from '../config/db.js';
 
 // Car Management
 export const createCar = async (req, res) => {
-  const { model, description, price_per_day, image_url } = req.body;
   try {
+    const { model, description, price_per_day } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'Image is required' });
+    }
+
+    const image_url = `/images/${req.file.filename}`;
+
     const [result] = await pool.query(
       'INSERT INTO cars (model, description, price_per_day, image_url) VALUES (?, ?, ?, ?)',
       [model, description, price_per_day, image_url]
     );
+
     res.status(201).json({ id: result.insertId });
   } catch (error) {
     res.status(500).json({ message: 'Error creating car' });
