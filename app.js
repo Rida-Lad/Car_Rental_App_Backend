@@ -37,6 +37,23 @@ app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
 // Routes
+
+// Get all cars (simplified data)
+app.get('/api/cars', (req, res) => {
+  const query = `
+    SELECT id, name, price_per_day, image, category 
+    FROM cars
+  `;
+  
+  db.execute(query, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(results);
+  });
+});
+
 app.post('/api/cars', upload.single('image'), (req, res) => {
   const { name, description, price_per_day, is_available, category } = req.body;
   const image = req.file ? req.file.path : null;
