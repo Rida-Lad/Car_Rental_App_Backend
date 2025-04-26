@@ -5,7 +5,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-
+   
 // MySQL connection
 const db = mysql.createConnection({
   host: 'localhost',
