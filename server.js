@@ -85,24 +85,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Middleware to verify JWT
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  
-  if (!token) return res.sendStatus(401);
-  
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-}
-
-// Protected route example
-app.get('/api/protected', authenticateToken, (req, res) => {
-  res.json({ message: 'Protected data', user: req.user });
-});
 
 const PORT = 5000;
 app.listen(PORT, () => {
