@@ -23,6 +23,9 @@ const pool = mysql.createPool({
 // JWT secret
 const JWT_SECRET = 'your_jwt_secret';
 
+app.get('/', (req, res) => {
+  res.send('Welcome to the Car Rental API!');
+});
 
 const PORT = 5000;
 app.listen(PORT, () => {
