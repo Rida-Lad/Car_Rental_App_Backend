@@ -23,42 +23,6 @@ const pool = mysql.createPool({
 // JWT secret
 const JWT_SECRET = 'your_jwt_secret';
 
-// Login endpoint
-app.post('/api/login', async (req, res) => {
-    try {
-      const { username, password } = req.body;
-      
-      // Find user
-      const [users] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
-      if (users.length === 0) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-      
-      const user = users[0];
-      
-      // Check password
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-      
-      // Create token
-      const token = jwt.sign(
-        { id: user.id, username: user.username, isAdmin: user.isadmin },
-        JWT_SECRET,
-        { expiresIn: '1h' }
-      );
-      
-      res.json({ 
-        token,
-        username: user.username,
-        isAdmin: user.isadmin
-      });
-    } catch (error) {
-      res.status(500).json({ message: 'Server error', error: error.message });
-    }
-  });
-
 
 const PORT = 5000;
 app.listen(PORT, () => {
