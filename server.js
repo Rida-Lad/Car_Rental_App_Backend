@@ -66,6 +66,16 @@ app.post('/api/cars', upload.single('image'), (req, res) => {
   });
 });
 
+// GET route to fetch all cars
+app.get('/api/cars', (req, res) => {
+  pool.query('SELECT * FROM cars', (err, results) => {
+    if (err) {
+      console.error('Fetch error:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(results);
+  });
+});
 
 // JWT secret
 // const JWT_SECRET = 'your_jwt_secret';
