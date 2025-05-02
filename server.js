@@ -1,11 +1,9 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
-const mysql = require('mysql2/promise');
-// const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
+const mysql = require('mysql2');
+
 
 const app = express();
 app.use(cors());
@@ -66,6 +64,7 @@ app.post('/api/cars', upload.single('image'), (req, res) => {
   });
 });
 
+
 // GET route to fetch all cars
 app.get('/api/cars', (req, res) => {
   pool.query('SELECT * FROM cars', (err, results) => {
@@ -77,12 +76,6 @@ app.get('/api/cars', (req, res) => {
   });
 });
 
-// JWT secret
-// const JWT_SECRET = 'your_jwt_secret';
-
-app.get('/', (req, res) => {
-  res.send('Welcome to the Car Rental API!');
-});
 
 const PORT = 5000;
 app.listen(PORT, () => {
