@@ -184,7 +184,42 @@ app.get('/api/cars', (req, res) => {
 });
 
 
+app.post('/api/admin/verify', (req, res) => {
+  const { access_code } = req.body;
+  pool.query('SELECT * FROM admins WHERE access_code = ?', [access_code], (err, results) => {
+    if (err) return res.status(500).json({ message: 'Server error' });
+    if (results.length > 0) return res.json({ is_admin: true });
+    res.status(401).json({ is_admin: false });
+  });
+});
 
+// Get all orders with user + car info
+app.get('/api/admin/orders', (req, res) => {
+  const sql = `
+    SELECT orders.*, users.username, cars.name AS car_name, cars.image_url
+    FROM orders
+    JOIN users ON orders.user_id = users.id
+    JOIN cars ON orders.car_id = cars.id
+    ORDER BY orders.created_at DESC
+  `;
+  pool.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ message: 'Error fetching orders' });
+    res.json(results);
+  });
+});
+
+// Update order status
+app.post('/api/admin/orders/:id/status', (req, res) => {
+  const { status } = req.body;
+  const orderId = req.params.id;
+  if (!['approved', 'declined'].includes(status)) {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+  pool.query('UPDATE orders SET status = ? WHERE id = ?', [status, orderId], (err) => {
+    if (err) return res.status(500).json({ message: 'Failed to update status' });
+    res.json({ message: 'Status updated' });
+  });
+});
 
 
 const PORT = 5000;
