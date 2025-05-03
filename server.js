@@ -75,6 +75,15 @@ app.post('/api/login', (req, res) => {
 });
 
 
+// Get current user route
+app.get('/api/me', (req, res) => {
+  if (req.session.user) {
+    res.json({ user: req.session.user, is_authenticated: true });
+  } else {
+    res.json({ is_authenticated: false });
+  }
+});
+
 
 // POST route
 app.post('/api/cars', upload.single('image'), (req, res) => {
