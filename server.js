@@ -153,6 +153,25 @@ app.post('/orders', (req, res) => {
 });
 
 
+
+app.get('/api/orders/user/:id', (req, res) => {
+  const userId = req.params.id;
+
+  const sql = `
+    SELECT orders.*, cars.name AS car_name, cars.image_url
+    FROM orders
+    JOIN cars ON orders.car_id = cars.id
+    WHERE orders.user_id = ?
+    ORDER BY orders.created_at DESC
+  `;
+
+  pool.query(sql, [userId], (err, results) => {
+    if (err) return res.status(500).json({ message: 'Failed to fetch orders' });
+    res.json(results);
+  });
+});
+
+
 // GET route to fetch all cars
 app.get('/api/cars', (req, res) => {
   pool.query('SELECT * FROM cars', (err, results) => {
@@ -163,6 +182,7 @@ app.get('/api/cars', (req, res) => {
     res.json(results);
   });
 });
+
 
 
 
