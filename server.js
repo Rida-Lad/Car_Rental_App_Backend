@@ -8,14 +8,48 @@ const mysql = require('mysql2');
 
 
 const app = express();
-app.use(cors());
+
+
 app.use(express.json());
+
+
+app.use(express.urlencoded({ extended: true }));
+
+
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  credentials: true, 
+}));
+
+
 app.use(session({
   secret: 'secret-key',
   resave: false,
   saveUninitialized: false,
+  cookie: {
+    secure: false, 
+    httpOnly: true,
+    sameSite: 'lax', 
+  },
 }));
+
+
 app.use('/uploads', express.static('uploads'));
+
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+
+const upload = multer({ storage: storage });
+
 
 // MySQL connection pool
 const pool = mysql.createPool({
@@ -29,18 +63,6 @@ const pool = mysql.createPool({
 });
 
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
-});
-const upload = multer({ storage: storage });
-
 
 
 // Signup route
@@ -49,7 +71,7 @@ app.post('/api/signup', async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], (err, result) => {
+  pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], (err, result) => {
     if (err) return res.status(500).json({ error: 'Signup failed' });
 
     req.session.user = { id: result.insertId, username };
@@ -57,11 +79,13 @@ app.post('/api/signup', async (req, res) => {
   });
 });
 
+
+
 // Login route
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
-  db.query('SELECT * FROM users WHERE username = ?', [username], async (err, results) => {
+  pool.query('SELECT * FROM users WHERE username = ?', [username], async (err, results) => {
     if (err || results.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
 
     const user = results[0];
@@ -75,6 +99,8 @@ app.post('/api/login', (req, res) => {
 });
 
 
+
+
 // Get current user route
 app.get('/api/me', (req, res) => {
   if (req.session.user) {
@@ -83,6 +109,7 @@ app.get('/api/me', (req, res) => {
     res.json({ is_authenticated: false });
   }
 });
+
 
 
 // POST route
@@ -114,6 +141,8 @@ app.post('/api/cars', upload.single('image'), (req, res) => {
 });
 
 
+
+
 // GET route to fetch all cars
 app.get('/api/cars', (req, res) => {
   pool.query('SELECT * FROM cars', (err, results) => {
@@ -124,6 +153,8 @@ app.get('/api/cars', (req, res) => {
     res.json(results);
   });
 });
+
+
 
 
 const PORT = 5000;
