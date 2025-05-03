@@ -193,6 +193,7 @@ app.post('/api/admin/verify', (req, res) => {
   });
 });
 
+
 // Get all orders with user + car info
 app.get('/api/admin/orders', (req, res) => {
   const sql = `
@@ -221,23 +222,6 @@ app.post('/api/admin/orders/:id/status', (req, res) => {
   });
 });
 
-
-// Get all cars
-app.get('/admin/cars', (req, res) => {
-  pool.query('SELECT * FROM cars', (err, results) => {
-    if (err) return res.status(500).json({ message: 'Error fetching cars' });
-    res.json(results);
-  });
-});
-
-// Toggle availability
-app.post('/admin/cars/:id/toggle', (req, res) => {
-  const carId = req.params.id;
-  pool.query('UPDATE cars SET is_available = NOT is_available WHERE id = ?', [carId], (err) => {
-    if (err) return res.status(500).json({ message: 'Failed to toggle availability' });
-    res.json({ message: 'Car availability toggled' });
-  });
-});
 
 
 const PORT = 5000;
