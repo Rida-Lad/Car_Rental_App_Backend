@@ -123,7 +123,7 @@ CREATE TABLE admins (
 ### 4. Start the Server
 
 ```bash
-node index.js
+node server.js
 ```
 
 Your server will be running at `http://localhost:5000`
@@ -162,9 +162,6 @@ Your server will be running at `http://localhost:5000`
 | `GET`  | `/api/admin/cars` | Get all cars in the system |
 | `POST` | `/api/admin/cars/:id/availability` | Toggle car availability |
 
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 👨‍💻 Contributors
 
