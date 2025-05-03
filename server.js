@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
 const path = require('path');
 const mysql = require('mysql2');
 
@@ -8,6 +10,11 @@ const mysql = require('mysql2');
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(session({
+  secret: 'secret-key',
+  resave: false,
+  saveUninitialized: false,
+}));
 app.use('/uploads', express.static('uploads'));
 
 // MySQL connection pool
@@ -33,6 +40,39 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage: storage });
+
+
+
+// Signup route
+app.post('/api/signup', async (req, res) => {
+  const { username, password } = req.body;
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Signup failed' });
+
+    req.session.user = { id: result.insertId, username };
+    res.json({ user: req.session.user, is_authenticated: true });
+  });
+});
+
+// Login route
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+
+  db.query('SELECT * FROM users WHERE username = ?', [username], async (err, results) => {
+    if (err || results.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
+
+    const user = results[0];
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) return res.status(401).json({ error: 'Invalid credentials' });
+
+    req.session.user = { id: user.id, username: user.username };
+    res.json({ user: req.session.user, is_authenticated: true });
+  });
+});
 
 
 
