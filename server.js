@@ -142,6 +142,16 @@ app.post('/api/cars', upload.single('image'), (req, res) => {
 
 
 
+app.post('/orders', (req, res) => {
+  const { user_id, car_id, hours, total_price } = req.body;
+
+  const sql = 'INSERT INTO orders (user_id, car_id, hours, total_price) VALUES (?, ?, ?, ?)';
+  pool.query(sql, [user_id, car_id, hours, total_price], (err, result) => {
+    if (err) return res.status(500).json({ message: 'Order failed' });
+    res.json({ message: 'Order placed successfully' });
+  });
+});
+
 
 // GET route to fetch all cars
 app.get('/api/cars', (req, res) => {
