@@ -223,6 +223,30 @@ app.post('/api/admin/orders/:id/status', (req, res) => {
 });
 
 
+// Get all cars
+app.get('/api/admin/cars', (req, res) => {
+  pool.query('SELECT * FROM cars', (err, results) => {
+    if (err) return res.status(500).json({ message: 'Error fetching cars' });
+    res.json(results);
+  });
+});
+
+// Update availability
+app.post('/api/admin/cars/:id/availability', (req, res) => {
+  const { isavailable } = req.body;
+  const carId = req.params.id;
+
+  pool.query(
+    'UPDATE cars SET isavailable = ? WHERE id = ?',
+    [isavailable, carId],
+    (err) => {
+      if (err) return res.status(500).json({ message: 'Failed to update availability' });
+      res.json({ message: 'Car availability updated' });
+    }
+  );
+});
+
+
 
 const PORT = 5000;
 app.listen(PORT, () => {
