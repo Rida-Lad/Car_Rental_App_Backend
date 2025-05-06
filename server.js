@@ -124,7 +124,7 @@ app.post('/api/cars', upload.single('image'), (req, res) => {
   const values = [
     name,
     image_url,
-    isavailable === 'true' ? 1 : 0,
+    isavailable === 'true' ? 1 : 0, 
     previous_price || null,
     new_price,
     brand,
