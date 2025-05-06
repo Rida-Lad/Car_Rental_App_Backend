@@ -78,7 +78,7 @@ app.post('/api/signup', async (req, res) => {
     res.json({ user: req.session.user, is_authenticated: true });
   });
 });
-
+  
 
 
 // Login route
@@ -97,7 +97,6 @@ app.post('/api/login', (req, res) => {
     res.json({ user: req.session.user, is_authenticated: true });
   });
 });
-
 
 
 
